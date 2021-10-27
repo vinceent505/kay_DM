@@ -5,6 +5,7 @@ import csv
 import numpy as np
 from collections import defaultdict
 from sklearn.preprocessing import LabelEncoder
+import time
 
 # TDB = [[1,3,4],[2,3,5],[1,2,3,5],[2,5]]
 global_L=[]
@@ -91,7 +92,7 @@ def itemlist1(TDB):   #C1
     return unique_list
 
 
-def get_L(itemsetlst,TDB,k): #[2,3,5]
+def get_L(itemsetlst,TDB,k, min_sup): #[2,3,5]
     
     #print('here',itemsetlst) 
     freq1 = []
@@ -118,7 +119,7 @@ def get_L(itemsetlst,TDB,k): #[2,3,5]
                         freq1[j]+=1
     out = []
     freq = []
-    min_sup = 3
+    #min_sup = 70
     #print(itemsetlst)
     for cnt in range(len(freq1)):
         support = freq1[cnt]
@@ -172,9 +173,17 @@ def rule_gen(global_L,global_freq,minConf=0.1):
     D = dict()
     ans = []
     for i,item in enumerate(global_L):
-        D[item] = global_freq[i]
+        if(str(type(item).__name__))=="int":
+            D[item] = global_freq[i]    
+        else:
+            try:
+                D[tuple(sorted(item))] = global_freq[i]
+            except:
+                print("error item: ", item)
+                print(type(item))
+                exit()
     # print(global_L,global_freq)
-    #print(D)
+    print("D: ", D)
     for item in D:
         l = []
         if(str(type(item).__name__))=="int":
@@ -198,7 +207,16 @@ def rule_gen(global_L,global_freq,minConf=0.1):
             if len(s)==1:
                 confidence = float(D[item]/D[s[0]])
             else:
-                confidence = float(D[item]/D[s])
+                try:
+                    if(str(type(s).__name__))=="int":
+                        confidence = float(D[item]/D[s])
+                    else:
+                        confidence = float(D[item]/D[tuple(sorted(s))])
+                except Exception as e:
+                    print(item)
+                    print(s)
+                    print(e)
+                    exit()
             # print("con: ", confidence)
             if(confidence > minConf):
                 st = set()
@@ -209,7 +227,7 @@ def rule_gen(global_L,global_freq,minConf=0.1):
         
 if __name__ == "__main__":
     #import_data()
-    
+    start = time.time()
     TDB = import_data()
     TDB = list(TDB.values())
 
@@ -237,9 +255,10 @@ if __name__ == "__main__":
     
     cur_L = []
     while True:
+        print(k)
         C2=get_C2(L,k) #[[1, 2], [1, 3], [1, 5], [2, 3], [2, 5], [3, 5]]
         # print('C2: ', C2) #[2,3,5]
-        L, freqlist = get_L(C2,TDB,k)
+        L, freqlist = get_L(C2,TDB,k, 70)
          
         if not len(L):
             break
@@ -260,3 +279,5 @@ if __name__ == "__main__":
     for i in ans:
         if len(i[1]):
             print(i[0], " implies ", i[1], ", confidence: ", i[2])
+
+    print("Total Time: ", time.time()-start, " sec")
