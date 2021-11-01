@@ -57,7 +57,7 @@ def import_data():
     d = defaultdict(str)
     for i , j in enumerate(myset):
         d[j] = i
-    print("d: ", d)
+    # print("d: ", d)
     labelencoder = LabelEncoder()
     myset = labelencoder.fit_transform(list(myset))
     
@@ -237,7 +237,6 @@ if __name__ == "__main__":
         TDB = import_data_test()
     elif str(sys.argv[1]) == "groceries":
         TDB, label_d = import_data()
-        print(label_d)
     TDB = list(TDB.values())
     time_dict = defaultdict()
     #for minsup in [60,100,200]:#70,80,90,100,200, 400, 600]:
@@ -286,6 +285,7 @@ if __name__ == "__main__":
     # print("ans: ", ans)  
     
     if str(sys.argv[1]) == "groceries":
+        ans = sorted(ans, key=lambda k: k[2])
         final_ans = {}
         final_ans = defaultdict(list)
         for i, j in enumerate(ans):
@@ -304,7 +304,6 @@ if __name__ == "__main__":
                     
                 final_ans[i][3].append(j[3])
 
-        print(final_ans)
         for num, i in enumerate(final_ans.values()):
             count+=1
             print("Relation rules: { {", ', '.join(i[0]), '} -> { ', ', '.join(i[1]), '} }')
@@ -320,7 +319,7 @@ if __name__ == "__main__":
         time_dict[minsup] = time.time()-start
         print(" ")
     elif str(sys.argv[1]) == "ibm-2021":
-        
+        ans = sorted(ans, key=lambda k: k[3])
         for i in ans:
             if len(i[1]):
                 count+=1
@@ -336,5 +335,5 @@ if __name__ == "__main__":
         # print("num: ", count)
         time_dict[minsup] = time.time()-start
         print(" ")
-    print(str(sys.argv[0]))
+    print("Executing file: ", str(sys.argv[0]))
 #print(time_dict)

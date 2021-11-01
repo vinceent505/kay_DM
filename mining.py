@@ -237,5 +237,7 @@ if __name__ == '__main__':
 
         print("Total Time: ", time.time()-start, " sec")
         print(" ")
+    
+    print("Executing file: ", str(sys.argv[0]))
 
     
