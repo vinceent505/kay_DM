@@ -51,7 +51,7 @@ def import_data():
     for num, item in enumerate(itemlist):
         return_dict[num] = item
     #print(return_dict)
-    return return_dict
+    return return_dict, {v : k for k, v in d.items()}
 
 def import_data_test():
     path = os.path.join(os.path.dirname(__file__),'ibm-2021.txt')
@@ -114,8 +114,8 @@ def rule_gen(freqItems,simDat , minConf,length): #freqItems = golbal_L   freq = 
     f = {}
     for i in freqItems:
         count = 0
-        for j in simDat:
-            if i.issubset(set(j)):
+        for j in simDat.values():
+            if i.issubset(frozenset(j)):
                 count += 1
         f[tuple(i)] = count
 
@@ -168,11 +168,7 @@ def rule_gen(freqItems,simDat , minConf,length): #freqItems = golbal_L   freq = 
                 st = set()
                 st = st.union(s)
                 ans.append([st, set(set(l).difference(st)), confidence, support])
-    for i in ans:
-        if len(i[1])!=0:
-            print("Relation rules: {",i[0],'->',i[1],'}')
-            print("support: ", i[2])
-            print("confidence: ", i[3])
+    return ans
     
     
         
@@ -188,8 +184,7 @@ if __name__ == '__main__':
     if str(sys.argv[1]) == "ibm-2021":
         simDat = import_data_test()
     elif str(sys.argv[1]) == "groceries":
-        simDat = import_data()
-    
+        simDat, label_d = import_data()
     time_dict = defaultdict()
     #for minsup in range(50,200,150):
     minsup = 50
@@ -201,12 +196,46 @@ if __name__ == '__main__':
     f = {}
     f = defaultdict(list)
     # global_freq = []
+    # print(myHeaderTab)
+
     mineFPtree(myFPtree, myHeaderTab, minsup, set([]), freqItems)
     length= len(simDat)
-    rule_gen(freqItems, simDat, minConf,length)
+    ans = rule_gen(freqItems, simDat, minConf,length)
+
     
-    # print('x',len(simDat))
-    # print('l',len(freqItems))
-    print("Total Time: ", time.time()-start, " sec")
-    time_dict[minsup] = time.time()-start
-    #print(time_dict)
+    if str(sys.argv[1]) == "ibm-2021":
+        for i in ans:
+            if len(i[1])!=0:
+                print("Relation rules: {",i[0],'->',i[1],'}')
+                print("support: ", i[2])
+                print("confidence: ", i[3])
+    elif str(sys.argv[1]) == "groceries":
+        final_ans = {}
+        final_ans = defaultdict(list)
+        for i, j in enumerate(ans):
+            if len(j[1]):
+                final_ans[i].append([])
+                final_ans[i].append([])
+                final_ans[i].append([])
+                final_ans[i].append([])
+                for k in j[0]:
+                    final_ans[i][0].append(label_d[k])
+                    pass
+                for k in j[1]:
+                    final_ans[i][1].append(label_d[k])
+                    pass
+                final_ans[i][2].append(j[2])
+                    
+                final_ans[i][3].append(j[3])
+
+        print(final_ans)
+        for num, i in enumerate(final_ans.values()):
+            print("Relation rules: { {", ', '.join(i[0]), '} -> { ', ', '.join(i[1]), '} }')
+            print('Support',i[3][0])
+            print('confidence',i[2][0])
+            print(' ')
+
+        print("Total Time: ", time.time()-start, " sec")
+        print(" ")
+
+    

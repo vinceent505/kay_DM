@@ -77,17 +77,13 @@ def createFPtree(dataSet, minSup=1):
 # 构形成 element : count 的形式，以字典形式输出
 def createInitSet(dataSet):
     retDict = {}
-    Trans = []
-    for trans in dataSet:
-        # print(trans)
-        # for item in trans:
-        #     Trans.append(item)
-        # trans = "".join(trans)
-        key = frozenset(Trans)
-        if key in retDict:
-            retDict[frozenset(trans)] += 1
-        else:
-            retDict[frozenset(trans)] = 1
+    for trans in dataSet.values():
+        key = frozenset(trans)
+        if len(key)!=0:
+            if key in retDict:
+                retDict[frozenset(trans)] += 1
+            else:
+                retDict[frozenset(trans)] = 1
         #print(retDict)
     return retDict
 
