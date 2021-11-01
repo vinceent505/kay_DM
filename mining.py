@@ -204,12 +204,14 @@ if __name__ == '__main__':
 
     
     if str(sys.argv[1]) == "ibm-2021":
+        ans = sorted(ans, key=lambda k: k[2])
         for i in ans:
             if len(i[1])!=0:
                 print("Relation rules: {",i[0],'->',i[1],'}')
                 print("support: ", i[2])
                 print("confidence: ", i[3])
     elif str(sys.argv[1]) == "groceries":
+        ans = sorted(ans, key=lambda k: k[2])
         final_ans = {}
         final_ans = defaultdict(list)
         for i, j in enumerate(ans):
